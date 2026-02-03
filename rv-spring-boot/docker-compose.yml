@@ -1,0 +1,27 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: school-db
+    environment:
+      MARIADB_DATABASE: school
+      MARIADB_ROOT_PASSWORD: 1234
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-p1234"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: school-app
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/school?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+    depends_on:
+      db:
+        condition: service_healthy # Chỉ chạy Java khi DB đã phản hồi 'ping' thành công
