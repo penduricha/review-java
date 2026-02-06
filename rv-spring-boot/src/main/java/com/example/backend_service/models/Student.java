@@ -14,7 +14,9 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "students")
+@Table(name = "students", indexes = {
+        @Index(name = "idx_student_id", columnList = "studentID")
+})
 public class Student implements Serializable {
     @Id
     @Column(nullable = false)

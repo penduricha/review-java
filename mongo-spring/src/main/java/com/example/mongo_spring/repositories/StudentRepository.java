@@ -10,8 +10,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StudentRepository extends MongoRepository<Student, String> {
+
+    Student findByStudentID(Long studentID);
+
     List<Student> findByGpaGreaterThanEqual(double gpa);
 
+    //db.students.find({ "gpa": { "$gte": 3 } })
     @Query("{ 'gpa' : { $gte: ?0 } }")
     List<Student> getStudentsHighAchieversByMinGpa(double minGpa);
 }

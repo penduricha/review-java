@@ -29,10 +29,26 @@ public class StudentService implements I_StudentService {
     }
 
     public Long deleteStudentByStudentID(Long studentID) throws MongoClientException {
-        return 0L;
+        Student studentFound = studentRepository.findByStudentID(studentID);
+        if(studentFound != null) {
+            studentRepository.delete(studentFound);
+            return studentFound.getStudentID();
+        }
+        return null;
     }
 
     public Student updateStudentByStudentID(Long studentID, Student student) throws MongoClientException {
+        Student studentFound = studentRepository.findByStudentID(studentID);
+        if(studentFound != null) {
+            if(student.getName() != null)
+                studentFound.setName(student.getName());
+            if(student.getDob() != null)
+                studentFound.setDob(student.getDob());
+            if(student.getGpa() != -1.0)
+                studentFound.setGpa(student.getGpa());
+            studentRepository.save(studentFound);
+            return studentFound;
+        }
         return null;
     }
 }
