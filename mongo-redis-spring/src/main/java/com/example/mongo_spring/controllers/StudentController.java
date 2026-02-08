@@ -5,9 +5,9 @@ import com.example.mongo_spring.models.Student;
 import com.example.mongo_spring.services.StudentService;
 import com.mongodb.MongoClientException;
 
-import java.time.DateTimeException;
+
 import java.time.LocalDate;
-import java.util.List;
+
 import java.util.Map;
 import java.util.Optional;
 import org.bson.types.ObjectId;
@@ -27,7 +27,7 @@ public class StudentController {
 
     @PostMapping
     public ResponseEntity<?> postStudent(@RequestBody Map<String, Object> studentToPost)
-            throws MongoClientException, IllegalArgumentException, DateTimeException, MappingException {
+            throws MongoClientException, IllegalArgumentException, MappingException {
         Integer studentIDInt = (Integer)studentToPost.get("studentID");
         Long studentID = studentIDInt != null ? studentIDInt.longValue() : null;
         String name = (String)studentToPost.get("name");
@@ -35,13 +35,14 @@ public class StudentController {
         Map<String, Object> dob = (Map)studentToPost.get("dob");
         LocalDate dobLocalDate = null;
         if (dob != null) {
-            Integer day = (Integer)dob.get("day");
-            Integer month = (Integer)dob.get("month");
-            Integer year = (Integer)dob.get("year");
+            Integer day = (Integer) dob.get("day");
+            Integer month = (Integer) dob.get("month");
+            Integer year = (Integer) dob.get("year");
             dobLocalDate = LocalDate.of(year, month, day);
         }
         Student studentToCreate = new Student(studentID, name, dobLocalDate, gpa);
         studentToCreate.setId((new ObjectId()).toString());
+        System.out.println(studentToCreate);
         Student studentCreated = this.studentService.createStudent(studentToCreate);
         return ResponseEntity.status(HttpStatus.CREATED).body(studentCreated);
     }
