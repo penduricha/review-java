@@ -9,6 +9,7 @@ import com.mongodb.MongoClientException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,10 @@ public class StudentService implements I_StudentService {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
+    //Query logic advance
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     private static final String STUDENT_IDS_SET = "student:all_student_ids";
 
@@ -32,9 +37,9 @@ public class StudentService implements I_StudentService {
         Student savedStudent = null;
         if (studentID != null) {
             Boolean isExisted = redisTemplate.opsForSet().isMember(STUDENT_IDS_SET, studentID);
-            Student foundStudentByStudentID = studentRepository.findByStudentID(studentID);
+            //Student foundStudentByStudentID = studentRepository.findByStudentID(studentID);
             //double check
-            if (Boolean.TRUE.equals(isExisted) || foundStudentByStudentID !=null) {
+            if (Boolean.TRUE.equals(isExisted)) {
                 // Đã tồn tại trong danh sách ID của Redis
                 return savedStudent;
             }
@@ -62,10 +67,17 @@ public class StudentService implements I_StudentService {
 //        throw new RuntimeException("Student with ID " + studentID + " not found");
         Boolean isExisted = redisTemplate.opsForSet().isMember(STUDENT_IDS_SET, studentID);
         if (Boolean.TRUE.equals(isExisted)) {
-            Student studentFound = studentRepository.findByStudentID(studentID);
-            redisTemplate.opsForSet().remove(STUDENT_IDS_SET, studentID);
-            studentRepository.delete(studentFound);
-            return studentFound.getStudentID();
+            // Student studentFound = studentRepository.findByStudentID(studentID);
+            //redisTemplate.opsForSet().remove(STUDENT_IDS_SET, studentID);
+            //studentRepository.delete(studentFound);
+            //return studentFound.getStudentID();
+            long deletedCount = studentRepository.deleteStudentByStudentID(studentID);
+            if (deletedCount > 0) {
+                // 3. Xóa thành công ở DB thì mới xóa ở Redis
+                redisTemplate.opsForSet().remove(STUDENT_IDS_SET, studentID);
+                return studentID;
+            }
+
         }
         throw new RuntimeException("Student with ID " + studentID + " not found");
     }

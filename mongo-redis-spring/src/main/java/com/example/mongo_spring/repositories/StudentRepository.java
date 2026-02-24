@@ -18,4 +18,6 @@ public interface StudentRepository extends MongoRepository<Student, String> {
     //db.students.find({ "gpa": { "$gte": 3 } })
     @Query("{ 'gpa' : { $gte: ?0 } }")
     List<Student> getStudentsHighAchieversByMinGpa(double minGpa);
+
+    long deleteStudentByStudentID(Long studentID);
 }

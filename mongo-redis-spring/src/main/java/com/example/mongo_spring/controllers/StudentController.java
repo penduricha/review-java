@@ -61,7 +61,8 @@ public class StudentController {
     @DeleteMapping
     public ResponseEntity<?> deleteStudentByStudentID
             (@RequestParam Long studentID) throws IllegalArgumentException {
-        return ResponseEntity.ok(this.studentService.deleteStudentByStudentID(studentID));
+        this.studentService.deleteStudentByStudentID(studentID);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping
